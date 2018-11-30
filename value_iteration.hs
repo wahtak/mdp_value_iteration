@@ -88,7 +88,6 @@ iterateIndicesR i indices f a
     -- recurse without adding value to list
     | otherwise         = iterateIndicesR (i + 1) indices f (f a)
 
--- from: https://gist.github.com/hanshoglund/5941143
 -- padL :: Int -> String -> String
 padL n s
     | length s < n  = replicate (n - length s) ' ' ++ s
@@ -98,6 +97,9 @@ formatValues values = unlines [unwords [padL 10 (take 8 (show elem)) | elem <- r
 
 formatLabels labels = unlines [unwords [padL 2 [elem] | elem <- row] | row <- labels]
 
+formatResults xs = map formatValues xs ++ [(formatLabels . bestActionLabels) (last xs)]
+
 main = do
-    putStrLn (unlines (map formatValues (iterateIndices [0, 1, 2, 5, 10, 1000] updatedValues initialValues)))
-    putStrLn (formatLabels (bestActionLabels (head (iterateIndices [1000] updatedValues initialValues))))
+    putStrLn (unlines
+        (formatResults
+            (iterateIndices [0, 1, 2, 5, 10, 1000] updatedValues initialValues)))
