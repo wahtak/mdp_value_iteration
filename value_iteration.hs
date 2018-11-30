@@ -1,5 +1,6 @@
 -- implementation of MDP value iteration in Haskell
 -- written by novice Haskell user (so don't expect well written code)
+-- see: http://www.cs.cmu.edu/afs/cs/academic/class/15780-s16/www/slides/mdps.pdf
 
 import Data.List
 import Data.Ord
@@ -76,16 +77,14 @@ bestActionLabel values pos
 
 -- iterate and add value to list for indices
 -- compare with implementation of built-in iterate:
---    iterate :: (a -> a) -> a -> [a]
---    iterate f a = a : iterate f (f a)
 iterateIndices :: [Int] -> (a -> a) -> a -> [a]
 iterateIndices indices f a = take (length indices) (iterateIndicesR 0 indices f a)
 
 iterateIndicesR :: Int -> [Int] -> (a -> a) -> a -> [a]
 iterateIndicesR i indices f a
-    -- recurse and add value to list
+-- recurse and add value to list
     | head indices == i = a : iterateIndicesR (i + 1) (tail indices) f (f a)
-    -- recurse without adding value to list
+-- recurse without adding value to list
     | otherwise         = iterateIndicesR (i + 1) indices f (f a)
 
 -- padL :: Int -> String -> String
