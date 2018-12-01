@@ -24,15 +24,15 @@ actions = [[(( 0, -1), 0.8), ((-1,  0), 0.1), (( 1,  0), 0.1)],
 actionLabels = ['<', '>', '^', 'v']
 
 -- initial values of zeros
-zeros nrow ncol = replicate nrow (replicate ncol 0.0)
+zeros nrow ncol = replicate nrow $ replicate ncol 0.0
 initialValues = zeros (numRows validPos) (numCols validPos)
 
 discountFactor = 0.9
 
 getAt ls (y, x) = ls !! y !! x
 
-numRows xss = length xss
-numCols xss = length (head xss)
+numRows = length
+numCols = length . head
 
 -- map a function to a 2d-list and pass coordinates to function
 map2dCoords :: ([[a]] -> (Int, Int) -> b) -> [[a]] -> [[b]]
@@ -49,10 +49,10 @@ isValidPos (y, x)
 -- move is a tuple of position offsets (dy, dx)
 applyMove (y, x) (dy, dx) = (y + dy, x + dx)
 
-isValidMove pos move = isValidPos (applyMove pos move)
+isValidMove pos move = isValidPos $ applyMove pos move
 
 moveValue values pos move
-    | isValidMove pos move = getAt values (applyMove pos move)
+    | isValidMove pos move = getAt values $ applyMove pos move
     | otherwise            = getAt values pos
 
 actionValue values pos action = sum [moveValue values pos move * prob | (move, prob) <- action]
@@ -72,7 +72,7 @@ bestActionLabels values = map2dCoords bestActionLabel values
 
 bestActionLabel :: [[Double]] -> (Int, Int) -> Char
 bestActionLabel values pos
-    | isValidPos pos = snd (maximumBy (comparing fst) (zip (map (actionValue values pos) actions) actionLabels))
+    | isValidPos pos = snd $ maximumBy (comparing fst) (zip (map (actionValue values pos) actions) actionLabels)
     | otherwise = ' '
 
 -- iterate and add value to list for indices
@@ -99,9 +99,7 @@ formatLabels labels = unlines [unwords [padL 2 [elem] | elem <- row] | row <- la
 formatResults xs = map formatValues xs ++ [(formatLabels . bestActionLabels) (last xs)]
 
 main = do
-    putStrLn (unlines
-        (formatResults
-            (iterateIndices [0, 1, 2, 5, 10, 1000] updatedValues initialValues)))
+    putStrLn $ unlines $ formatResults $ iterateIndices [0, 1, 2, 5, 10, 1000] updatedValues initialValues
 
 
 -- output:
